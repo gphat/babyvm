@@ -10,6 +10,8 @@ Bob's code was easy to follow, but I was interested in seeing it work for myself
 would be useful to create a barebones projects for other interested in toying with a simple
 garbage collector.
 
+I also took the liberty of peppering some `printf`s around to report the status of various things.
+
 It's also been many years since I wrote any C and this was a nice reminder of how to do it.
 
 ## Compiling
