@@ -7,7 +7,7 @@ described at Bob Nystrom's blog post
 ## Description
 
 Bob's code was easy to follow, but I was interested in seeing it work for myself. I though it
-would be useful to create a barebones projects for other interested in toying with a simple
+would be useful to create a barebones projects for others interested in toying with a simple
 garbage collector.
 
 I also took the liberty of peppering some `printf`s around to report the status of various things.
