@@ -16,7 +16,9 @@ typedef struct sObject {
   /* What type of object is this? */
   ObjectType type;
 
-  /* Marked for collection */
+  /* Marked for collection. Note that storing this in the object is a bad idea
+     because GC will cause copy-on-write to go nuts in the event you are using
+     fork(). It's good enough for this demo, though. */
   unsigned char marked;
 
   /* The VM keeps it's own reference to objects that are distinct
