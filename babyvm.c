@@ -4,6 +4,13 @@
 
 #define STACK_MAX 256
 
+/* This is an implementation of a Naïve mark-and-sweep garbage collector as explained by
+   Bob Nystrom at http://journal.stuffwithstuff.com/2013/12/08/babys-first-garbage-collector/.
+ 
+   For more information you might want to also look at:
+   http://en.wikipedia.org/wiki/Garbage_collection_(computer_science)#Na.C3.AFve_mark-and-sweep
+*/
+
 /* Our language has two types, INT and PAIR. PAIR can contain more pairs
    or ints. Yay! */
 typedef enum {
