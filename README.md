@@ -10,6 +10,8 @@ Bob's code was easy to follow, but I was interested in seeing it work for myself
 would be useful to create a barebones projects for other interested in toying with a simple
 garbage collector.
 
+It's also been many years since I wrote any C and this was a nice reminder of how to do it.
+
 ## Compiling
 
 Requires make and gcc.  Compile with `make` and run `make clean` to destroy the evidence.

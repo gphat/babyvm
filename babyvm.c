@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #define STACK_MAX 256
@@ -81,6 +82,7 @@ void mark(Object* object) {
    in memory, so that means walking the stack. Using mark() this will
    mark every object in memory that is reachable. */
 void markAll(VM* vm) {
+  printf("\tMarking %d objects\n", vm->stackSize);
   for(int i = 0; i < vm->stackSize; i++) {
     mark(vm->stack[i]);
   }
@@ -90,6 +92,8 @@ void markAll(VM* vm) {
    aren't marked. */
 void sweep(VM* vm) {
   Object** object = &vm->firstObject;
+  int swept = 0;
+  int freed = 0;
   while(*object) {
     if(!(*object)->marked) {
       /* This object wasn't reached, so remove it from the list and free it. */
@@ -97,6 +101,8 @@ void sweep(VM* vm) {
 
       *object = unreached->next;
       free(unreached);
+      /* Increment the number we've freed. */
+      freed++;
       /* Decrement the count of objects */
       vm->numObjects--;
     } else {
@@ -105,11 +111,15 @@ void sweep(VM* vm) {
       (*object)->marked = 0;
       object = &(*object)->next;
     }
+    /* Increment the number we've swept. */
+    swept++;
   }
+  printf("\tSwept %d objects, freed %d.\n", swept, freed);
 }
 
 /* Perform a garbage collection. */
 void gc(VM* vm) {
+  printf("\nEntering GC\n");
   int numObjects = vm->numObjects;
 
   /* Mark… */
@@ -120,12 +130,14 @@ void gc(VM* vm) {
   /* Change the threshold for the next collection to 2 times the new
      number of objects. */
   vm->maxObjects = vm->numObjects * 2;
+  printf("GC completed, Total objects now %d. Threshold is %d.\n\n", vm->numObjects, vm->maxObjects);
 }
 
 /* Function for adding an object from the stack. */
 void push(VM* vm, Object* value) {
   assert(vm->stackSize < STACK_MAX); // Stack overflow
   vm->stack[vm->stackSize++] = value;
+  printf("Adding object to stack, size is now %d.\n", vm->stackSize);
 }
 
 /* Function for removing an object from the stack. */
@@ -139,8 +151,12 @@ Object* newObject(VM* vm, ObjectType type) {
 
   /* If the number of objects in the stack is equal to the max objects
      threshold, run the garbage collector. */
+  printf("Checking for GC: %d objects in stack == %d max objects\n", vm->numObjects, vm->maxObjects);
   if(vm->numObjects == vm->maxObjects) {
+    printf("GC needed\n");
     gc(vm);
+  } else {
+    printf("GC not needed\n");
   }
 
   /* Allocate the new object */
@@ -156,6 +172,7 @@ Object* newObject(VM* vm, ObjectType type) {
 
   /* Increment the object count */
   vm->numObjects++;
+  printf("Created object, number of objects is now %d\n", vm->numObjects);
   /* Return the object back to our caller. */
   return object;
 }
@@ -176,5 +193,32 @@ Object* pushPair(VM* vm) {
 }
 
 int main() {
+  /* Create a new VM */
+  VM* vm = newVM();
+  vm->maxObjects = 1;
+
+  printf("Adding integer 0 to the stack.\n");
+  pushInt(vm, 0);
+
+  printf("Adding integer 1 to the stack.\n");
+  pushInt(vm, 1);
+
+  printf("Adding a pair to the stack (consuming two ints already there).\n");
+  pushPair(vm);
+
+  printf("There are now %d objects in stack and %d objects have been allocated.\n", vm->stackSize, vm->numObjects);
+
+  /* Remove it from the stack, simulating the variable no longer being referenced. */
+  printf("Popping pair from the stack.\n");
+  Object* o = pop(vm);
+
+  printf("There are now %d objects in stack and %d objects have been allocated.\n", vm->stackSize, vm->numObjects);
+
+  printf("Manual invoking GC (should free all)");
+  gc(vm);
+
+  /* Done with the VM! */
+  free(vm);
+
   return 0;
 }
